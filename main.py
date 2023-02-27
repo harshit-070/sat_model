@@ -52,7 +52,7 @@ class AudioTranslateRequest(BaseModel):
     target_lang: str
 
 
-@app.post("/`audio`")
+@app.post("/audio")
 async def translateAudio(request: AudioTranslateRequest = Body(...)):
     text = request.text
     target_langs = request.target_lang
