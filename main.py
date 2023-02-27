@@ -12,7 +12,8 @@ import soundfile
 import speech_recognition as sr
 import requests
 from pydub import AudioSegment
-
+import moviepy.editor
+import tempfile
 
 load_dotenv()
 session_token = os.getenv("CHAT_GPT_SESSION_TOKEN")
@@ -123,4 +124,40 @@ async def audioConversion(request: AudioTextConversionRequest = Body(...)):
     tt = GoogleTranslator(source="auto", target=request.target_lang).translate(text)
 
     # Return the resulting transcription
+    return {"transcription": tt}
+
+
+class VideoAudioConversion(BaseModel):
+    url: str
+    target_lang: str
+    chatId: str
+
+
+@app.post("/video")
+async def audioConversion(request: AudioTextConversionRequest = Body(...)):
+    # Read the audio file using soundfile
+    # response = requests.get(request.url)
+    # file_contents = response.content
+    response = requests.get(request.url)
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(response.content)
+        temp_filepath = f.name
+    video = moviepy.editor.VideoFileClip(temp_filepath)
+    audio = video.audio
+    audio.write_audiofile(f"./{request.chatId}.wav")
+    data, samplerate = soundfile.read(audio.audio_path)
+
+    # Write the audio data to a new file
+    sound_file = f"./{request.chatId}.wav"
+    soundfile.write(sound_file, data, samplerate, subtype="PCM_16")
+
+    # Transcribe the audio using speech recognition
+    r = sr.Recognizer()
+    with sr.AudioFile(sound_file) as source:
+        audio_data = r.record(source)
+        text = r.recognize_google(audio_data)
+    tt = GoogleTranslator(source="auto", target=request.target_lang).translate(text)
+
+    # Return the resulting transcription
+    os.remove(temp_filepath)
     return {"transcription": tt}
