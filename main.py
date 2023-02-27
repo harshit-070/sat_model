@@ -37,14 +37,14 @@ class ChatGPTRequest(BaseModel):
     text: str
 
 
-api = ChatGPT(session_token)
+# api = ChatGPT(session_token)
 
 
-@app.post("/chat")
-async def chatGPT(request: ChatGPTRequest = Body(...)):
-    text = request.text
-    response = api.send_message(text)
-    return {"answer": response["message"]}
+# @app.post("/chat")
+# async def chatGPT(request: ChatGPTRequest = Body(...)):
+#     text = request.text
+#     response = api.send_message(text)
+#     return {"answer": response["message"]}
 
 
 class AudioTranslateRequest(BaseModel):
@@ -52,7 +52,7 @@ class AudioTranslateRequest(BaseModel):
     target_lang: str
 
 
-@app.post("/audio")
+@app.post("/`audio`")
 async def translateAudio(request: AudioTranslateRequest = Body(...)):
     text = request.text
     target_langs = request.target_lang
