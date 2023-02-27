@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from gtts import gTTS
 import soundfile
 import speech_recognition as sr
+import requests
+from pydub import AudioSegment
 
 
 load_dotenv()
@@ -100,9 +102,14 @@ class AudioTextConversionRequest(BaseModel):
 
 
 @app.post("/audio_text")
-async def audioConversion(request: AudioConversionRequest = Body(...)):
+async def audioConversion(request: AudioTextConversionRequest = Body(...)):
     # Read the audio file using soundfile
-    data, samplerate = soundfile.read(request.url)
+    response = requests.get(request.url)
+    file_contents = response.content
+    audio = AudioSegment.from_file(io.BytesIO(file_contents))
+    print(audio)
+    wav_data = audio.export(format="wav").read()
+    data, samplerate = soundfile.read(io.BytesIO(wav_data))
 
     # Write the audio data to a new file
     sound_file = f"{request.chatId}.wav"
