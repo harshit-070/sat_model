@@ -3,3 +3,4 @@ pyvenv.cfg
 Scripts
 Include
 __pycache__
+.env
