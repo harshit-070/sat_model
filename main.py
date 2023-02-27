@@ -42,14 +42,14 @@ class ChatGPTRequest(BaseModel):
     text: str
 
 
-api = ChatGPT(session_token)
+# api = ChatGPT(session_token)
 
 
-@app.post("/chat")
-async def chatGPT(request: ChatGPTRequest = Body(...)):
-    text = request.text
-    response = api.send_message(text)
-    return {"answer": response["message"]}
+# @app.post("/chat")
+# async def chatGPT(request: ChatGPTRequest = Body(...)):
+#     text = request.text
+#     response = api.send_message(text)
+#     return {"answer": response["message"]}
 
 
 class AudioTranslateRequest(BaseModel):
