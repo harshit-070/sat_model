@@ -14,6 +14,7 @@ import requests
 from pydub import AudioSegment
 import moviepy.editor
 import tempfile
+import openai
 
 load_dotenv()
 session_token = os.getenv("CHAT_GPT_SESSION_TOKEN")
@@ -43,14 +44,21 @@ class ChatGPTRequest(BaseModel):
     text: str
 
 
-api = ChatGPT(session_token)
+openai.api_key = session_token
 
 
 @app.post("/chat")
 async def chatGPT(request: ChatGPTRequest = Body(...)):
     text = request.text
-    response = api.send_message(text)
-    return {"answer": response["message"]}
+    completions = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=text,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+    return {"answer": completions.choices[0].text}
 
 
 class AudioTranslateRequest(BaseModel):
