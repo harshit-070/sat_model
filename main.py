@@ -88,20 +88,18 @@ class AudioConversionRequest(BaseModel):
 @app.post("/audio_conversion")
 async def audioConversion(request: AudioConversionRequest = Body(...)):
     # Read the audio file using soundfile
-    data, samplerate = soundfile.read(request.url)
+    response = requests.get(request.url)
+    audio = io.BytesIO(response.content)
 
-    # Write the audio data to a new file
-    sound_file = f"{request.chatId}.wav"
-    soundfile.write(sound_file, data, samplerate, subtype="PCM_16")
-
-    # Transcribe the audio using speech recognition
+    # Initialize the speech recognizer
     r = sr.Recognizer()
-    with sr.AudioFile(sound_file) as source:
+
+    # Convert speech to text
+    with sr.AudioFile(audio) as source:
         audio_data = r.record(source)
         text = r.recognize_google(audio_data)
 
-    # Return the resulting transcription
-    # return {"transcription": tt}
+    return {"text": text}
 
 
 class AudioTextConversionRequest(BaseModel):
